@@ -40,8 +40,15 @@ module Pharos
       Pharos::PhaseManager.load_phases(__dir__ + '/phases/')
       addon_dirs = [
         File.join(__dir__, '..', '..', 'addons'),
-        File.join(Dir.pwd, 'addons')
       ] + @config.addon_paths.map { |d| File.join(Dir.pwd, d) }
+
+      if File.directory?(File.join(Dir.pwd, 'addons')) && !File.exist?(File.join(Dir.pwd, 'pharos-cluster.gemspec'))
+        addon_dirs << File.join(Dir.pwd, 'addons')
+        warn '[DEPRECATED] The addons from directory "addons" will not be loaded in the next major release, use "pharos-addons" instead.'
+      end
+      addon_dirs << File.join(Dir.pwd, 'pharos-addons')
+
+      addon_dirs << File.join(Dir.pwd, 'addons')
       addon_dirs.keep_if { |dir| File.exist?(dir) }
       addon_dirs = addon_dirs.map { |dir| Pathname.new(dir).realpath.to_s }.uniq
 
